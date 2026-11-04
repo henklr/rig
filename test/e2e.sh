@@ -193,6 +193,7 @@ check "sudo needs a password" sh -c '! sudo -n true'
 check "claude runs" claude --version
 check "yay runs" yay --version
 check "git history is attached" git -C "$HOME/rig" log -1
+check "git pull and push have an upstream" git -C "$HOME/rig" rev-parse --verify '@{upstream}'
 check "repo is clean" sh -c 'test -z "$(git -C "$HOME/rig" status --porcelain)"'
 check "config is linked from the repo" sh -c 'test "$(readlink -f ~/.config/hypr)" = "$HOME/rig/config/hypr"'
 check "Hyprland accepts the config" sh -c 'Hyprland --verify-config 2>&1 | grep -q "config ok"'
@@ -297,16 +298,20 @@ check_rerun() {
   say "Running the one-liner again on the installed system"
   remote "$USERNAME@localhost" "PASSWORD=$PASSWORD REPO=$REPO BRANCH=$BRANCH bash -ls" <<'EOF' | tee rerun.txt
 rule=/etc/sudoers.d/99-e2e
-printf '%s\n' "$PASSWORD" | sudo -S sh -c "echo '$USER ALL=(ALL:ALL) NOPASSWD: ALL' >$rule"
+# verifypw too: sudo -v still asks as long as any other rule needs a password.
+printf '%s\n' "$PASSWORD" | sudo -S sh -c \
+  "printf '%s\n' 'Defaults:$USER verifypw=any' '$USER ALL=(ALL:ALL) NOPASSWD: ALL' >$rule"
 curl -fsSL "https://github.com/$REPO/raw/$BRANCH/install.sh" |
   RIG_REPO=$REPO RIG_BRANCH=$BRANCH bash >/tmp/rerun.log 2>&1
 echo "exit: $?"
 tail -6 /tmp/rerun.log
+grep -c 'could not update' /tmp/rerun.log | sed 's/^/update warnings: /'
 sudo rm -f "$rule"
 echo "repo changes: [$(git -C "$HOME/rig" status --porcelain)]"
 if [[ -e ~/.local/state/rig/first-boot ]]; then echo "flag: there"; else echo "flag: gone"; fi
 EOF
   grep -q '^exit: 0$' rerun.txt || fail "the installer failed on an installed system."
+  grep -q '^update warnings: 0$' rerun.txt || fail "a second run could not update ~/rig."
   grep -q '^repo changes: \[\]$' rerun.txt || fail "a second run changed the repo."
   grep -q '^flag: gone$' rerun.txt || fail "a second run brought back the first-login flag."
 }

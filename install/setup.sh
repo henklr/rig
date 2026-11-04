@@ -102,6 +102,7 @@ attach_git_history() {
   git -C "$RIG_DIR" remote add origin "$url"
   if git -C "$RIG_DIR" fetch -q origin "$branch"; then
     git -C "$RIG_DIR" reset -q "origin/$branch"
+    git -C "$RIG_DIR" branch -q --set-upstream-to="origin/$branch"
   else
     warn "could not reach $url. ~/rig works, it just has no history yet."
   fi
