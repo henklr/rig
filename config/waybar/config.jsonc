@@ -1,42 +1,39 @@
 {
   "layer": "top",
   "position": "top",
-  "height": 30,
-  "spacing": 12,
-
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "network", "bluetooth", "battery", "tray"],
+  "modules-right": ["pulseaudio", "bluetooth", "network", "battery", "tray"],
 
-  "hyprland/workspaces": {
-    "format": "{id}"
-  },
   "clock": {
-    "format": "{:%a %d %b  %H:%M}",
-    "tooltip-format": "<tt>{calendar}</tt>"
+    "format": "{:%H:%M}",
+    "tooltip-format": "{:%A, %d %B %Y}",
+    "on-click": "thunderbird -calendar"
   },
+
   "pulseaudio": {
-    "format": "vol {volume}%",
-    "format-muted": "muted",
+    "format": " {volume}%",
     "on-click": "pavucontrol"
   },
-  "network": {
-    "format-wifi": "{essid}",
-    "format-ethernet": "wired",
-    "format-disconnected": "offline",
-    "on-click": "ghostty -e nmtui"
-  },
+
   "bluetooth": {
-    "format": "",
-    "format-connected": "bt {num_connections}",
+    "format": "",
+    "format-disabled": "󰂲",
     "on-click": "blueman-manager"
   },
-  "battery": {
-    "format": "bat {capacity}%",
-    "format-charging": "chg {capacity}%",
-    "states": { "low": 15 }
+
+  "network": {
+    "format": "󰤨",
+    "format-disabled": "󰤭",
+    "tooltip-format": "{essid}",
+    "on-click": "alacritty -e nmtui"
   },
-  "tray": {
-    "spacing": 8
+
+  "battery": {
+    "format": "{capacity}% {icon}",
+    "format-charging": " {capacity}%",
+    //"format-plugged": " {capacity}%",
+    //"format-full": " {capacity}%",
+    "format-icons": ["", "", "", "", ""]
   }
 }
