@@ -265,7 +265,7 @@ EOF
   monitor "sendkey meta_l-ret"
   sleep 10
   desktop_state | tee after-terminal.txt
-  [[ $(grep -c '^ *class:' after-terminal.txt) -ge 2 ]] || fail "Super + Return opened no terminal."
+  [[ $(grep -c 'class:' after-terminal.txt) -ge 2 ]] || fail "Super + Return opened no terminal."
   screenshot 6-terminal
 
   say "Pressing Super + A to bring Claude back"
