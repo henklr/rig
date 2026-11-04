@@ -261,6 +261,7 @@ EOF
   desktop_state | tee after-hide.txt
   grep -q 'special: *$' after-hide.txt || fail "Super + A did not hide Claude."
   screenshot 5-claude-hidden
+  wallpaper_state | tee wallpaper.txt
 
   say "Pressing Super + Return for a terminal"
   monitor "sendkey meta_l-ret"
@@ -294,6 +295,22 @@ EOF
 # The same one-liner on a system that's already installed, which is also how
 # you repair it. After the first login, so a second run can't bring back the
 # flag that opens Claude. Passwordless for this run only: nobody is here to type.
+wallpaper_state() {
+  remote "$USERNAME@localhost" bash -ls <<'EOF' || true
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "$XDG_RUNTIME_DIR/hypr" | head -1)
+export WAYLAND_DISPLAY=$(basename "$(ls "$XDG_RUNTIME_DIR"/wayland-* | grep -v lock | head -1)")
+echo "running: $(pgrep -a hyprpaper || echo no)"
+ls -la ~/.local/share/wallpapers/swirl.jpg ~/.config/hypr/hyprpaper.conf
+echo "--- layers"
+hyprctl layers | grep -iE 'namespace|Level' | head -12
+echo "--- hyprpaper"
+pkill -x hyprpaper
+sleep 1
+timeout 15 hyprpaper --verbose 2>&1 | tail -30
+EOF
+}
+
 check_rerun() {
   say "Running the one-liner again on the installed system"
   remote "$USERNAME@localhost" "PASSWORD=$PASSWORD REPO=$REPO BRANCH=$BRANCH bash -ls" <<'EOF' | tee rerun.txt
