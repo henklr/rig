@@ -13,7 +13,7 @@ source lib/common.sh
 
 pacman_options=(--noconfirm --needed)
 sed -i 's/^#\?ParallelDownloads.*/ParallelDownloads = 8/' /etc/pacman.conf
-pacman -Sy --noconfirm >/dev/null
+pacman -Syu --noconfirm >/dev/null
 
 step "Package names"
 mapfile -t packages < <(read_pkgs packages/*.txt)

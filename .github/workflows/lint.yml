@@ -1,8 +1,13 @@
 name: lint
 
+# Weekly as well, against whatever Arch ships by then: Hyprland can change its
+# config language in a release, and this should fail before your machine does.
 on:
   push:
   pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * 1'
 
 jobs:
   lint:

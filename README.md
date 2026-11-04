@@ -77,4 +77,4 @@ Installeren kan køres igen. Det er også sådan, du reparerer eller opdaterer:
 
 ## Test
 
-`test/lint.sh` tjekker scripts, pakkenavne og configs. GitHub-workflowet **e2e** installerer hele systemet fra en rigtig ISO i en virtuel maskine, booter det og tager et skærmbillede.
+`test/lint.sh` tjekker scripts, pakkenavne og configs ved hvert push og hver mandag mod de nyeste pakker. GitHub-workflowet **e2e** installerer hele systemet fra en rigtig ISO i en virtuel maskine, booter det og tager et skærmbillede.

@@ -41,7 +41,7 @@ Vigtigt: Hyprland har skiftet config-sprog, og det meste, der står på nettet, 
 
 ## Tests
 
-- `test/lint.sh`: shellcheck, pakkenavne og Hyprlands egen config-validering i en Arch-container.
+- `test/lint.sh`: shellcheck, pakkenavne og Hyprlands egen config-validering i en Arch-container. Kører ved hvert push og hver mandag mod de nyeste pakker. Fejler mandagskørslen uden at repoet er ændret, har en opdatering sandsynligvis brudt noget, så vent med `pacman -Syu`, til det er rettet.
 - `.github/workflows/e2e.yml`: Installerer hele systemet fra en rigtig Arch-ISO i QEMU, booter det og tager et skærmbillede. Kør den, når du har ændret noget i `install/`, for fejl dér kan først ses, når disken er slettet.
 
 Bash-scripts skal bestå `shellcheck`.
