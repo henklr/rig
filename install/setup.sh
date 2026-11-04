@@ -195,9 +195,9 @@ write_machine_config() {
 configure_claude() {
   step "Introducing Claude to the system"
   link claude/CLAUDE.md .claude/CLAUDE.md
+  [[ -e $HOME/.claude/settings.json ]] && return 0
   # Copied, not linked: Claude Code writes to this file itself.
-  [[ -e $HOME/.claude/settings.json ]] ||
-    cp "$RIG_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+  cp "$RIG_DIR/claude/settings.json" "$HOME/.claude/settings.json"
   # Hyprland reads this flag once and opens Claude on the first login.
   touch "$HOME/.local/state/rig/first-boot"
 }

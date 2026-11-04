@@ -32,7 +32,7 @@ Vigtigt: Hyprland har skiftet config-sprog, og det meste, der står på nettet, 
 - API'et er `/usr/share/hypr/stubs/hl.meta.lua`, og wikien ligger på `https://wiki.hypr.land/configuring/` med små bogstaver.
 - `hyprctl dispatch` tager Lua: `hyprctl dispatch 'hl.dsp.exit()'`. Den gamle `hyprctl dispatch exit` virker ikke.
 - `hyprlock` og `hypridle` bruger stadig det gamle `.conf`-format.
-- Kør altid `Hyprland --verify-config` før du gemmer en ændring, der skal bruges nu.
+- Kør `Hyprland --verify-config` efter hver ændring i configen.
 - Sessionen startes med `start-hyprland` fra `shell/bash_profile`, uden display manager eller uwsm.
 
 ## Kendte huller

@@ -246,20 +246,69 @@ EOF
   fi
 
   say "Inspecting the running desktop"
-  remote "$USERNAME@localhost" bash -ls <<'EOF' | tee desktop.txt
-export XDG_RUNTIME_DIR=/run/user/$(id -u)
-echo "--- config errors"; hyprctl configerrors
-echo "--- monitors"; hyprctl monitors | head -3
-echo "--- windows"; hyprctl clients | grep -E 'class|title|workspace'
-echo "--- processes"; pgrep -a 'waybar|mako|hypridle' | cut -c1-60
-echo "--- screenshot"; grim /tmp/desktop.png && echo saved
-EOF
-  scp -i key -P "$SSH_PORT" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-    -o LogLevel=ERROR "$USERNAME@localhost:/tmp/desktop.png" 5-desktop.png || true
-  screenshot 6-end
-
+  desktop_state | tee desktop.txt
   grep -q 'class: rig.copilot' desktop.txt ||
     fail "Claude's window did not open on first login."
+  grep -q 'special: special:copilot' desktop.txt ||
+    fail "Claude's window is not showing on first login."
+  grep -q 'flag: gone' desktop.txt ||
+    fail "the first-login flag is still there, so Claude would open at every login."
+
+  say "Pressing Super + A to hide Claude"
+  monitor "sendkey meta_l-a"
+  sleep 3
+  desktop_state | tee after-hide.txt
+  grep -q 'special: *$' after-hide.txt || fail "Super + A did not hide Claude."
+  screenshot 5-claude-hidden
+
+  say "Pressing Super + Return for a terminal"
+  monitor "sendkey meta_l-ret"
+  sleep 10
+  desktop_state | tee after-terminal.txt
+  [[ $(grep -c '^ *class:' after-terminal.txt) -ge 2 ]] || fail "Super + Return opened no terminal."
+  screenshot 6-terminal
+
+  say "Pressing Super + A to bring Claude back"
+  monitor "sendkey meta_l-a"
+  sleep 3
+  desktop_state | tee after-show.txt
+  grep -q 'special: special:copilot' after-show.txt || fail "Super + A did not bring Claude back."
+  screenshot 7-claude-back
+}
+
+# Prints what's on screen in a form the checks above can grep. An SSH session
+# isn't part of the desktop, so it has to find the running Hyprland first.
+desktop_state() {
+  remote "$USERNAME@localhost" bash -ls <<'EOF'
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "$XDG_RUNTIME_DIR/hypr" | head -1)
+echo "errors: $(hyprctl configerrors)"
+hyprctl clients | grep -E '^\s*class:'
+echo "special: $(hyprctl monitors -j | jq -r '.[0].specialWorkspace.name')"
+echo "processes: $(pgrep -c 'waybar|mako|hypridle')"
+if [[ -e ~/.local/state/rig/first-boot ]]; then echo "flag: there"; else echo "flag: gone"; fi
+EOF
+}
+
+# The same one-liner on a system that's already installed, which is also how
+# you repair it. After the first login, so a second run can't bring back the
+# flag that opens Claude. Passwordless for this run only: nobody is here to type.
+check_rerun() {
+  say "Running the one-liner again on the installed system"
+  remote "$USERNAME@localhost" "PASSWORD=$PASSWORD REPO=$REPO BRANCH=$BRANCH bash -ls" <<'EOF' | tee rerun.txt
+rule=/etc/sudoers.d/99-e2e
+printf '%s\n' "$PASSWORD" | sudo -S sh -c "echo '$USER ALL=(ALL:ALL) NOPASSWD: ALL' >$rule"
+curl -fsSL "https://github.com/$REPO/raw/$BRANCH/install.sh" |
+  RIG_REPO=$REPO RIG_BRANCH=$BRANCH bash >/tmp/rerun.log 2>&1
+echo "exit: $?"
+tail -6 /tmp/rerun.log
+sudo rm -f "$rule"
+echo "repo changes: [$(git -C "$HOME/rig" status --porcelain)]"
+if [[ -e ~/.local/state/rig/first-boot ]]; then echo "flag: there"; else echo "flag: gone"; fi
+EOF
+  grep -q '^exit: 0$' rerun.txt || fail "the installer failed on an installed system."
+  grep -q '^repo changes: \[\]$' rerun.txt || fail "a second run changed the repo."
+  grep -q '^flag: gone$' rerun.txt || fail "a second run brought back the first-login flag."
 }
 
 prepare
@@ -267,4 +316,5 @@ install_from_iso
 unlock_disk
 check_system
 check_desktop
+check_rerun
 say "Everything passed"
