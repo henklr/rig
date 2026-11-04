@@ -145,6 +145,17 @@ install_aur_helper() {
   rm -rf "$dir"
 }
 
+# Anything here can fail without stopping the install: Firefox is the fallback
+# browser, and GTK falls back to its default theme.
+install_aur_packages() {
+  command -v yay >/dev/null || return 0
+  step "Installing from the AUR"
+  local -a packages
+  mapfile -t packages < <(read_pkgs "$RIG_DIR/packages/aur.txt")
+  yay -S --needed --noconfirm "${packages[@]}" ||
+    warn "could not install ${packages[*]}. Claude can try again later."
+}
+
 # link SOURCE_IN_REPO TARGET_IN_HOME: the config stays in ~/rig under git, so
 # whatever you and Claude change is versioned. Anything in the way is kept.
 link() {
@@ -160,7 +171,7 @@ link() {
 link_dotfiles() {
   step "Linking the configuration"
   local path
-  for path in "$RIG_DIR"/config/*/; do
+  for path in "$RIG_DIR"/config/*; do
     path=$(basename "$path")
     link "config/$path" ".config/$path"
   done
@@ -170,6 +181,32 @@ link_dotfiles() {
   done
   link shell/bashrc .bashrc
   link shell/bash_profile .bash_profile
+}
+
+fetch_wallpapers() {
+  step "Fetching wallpapers"
+  local dir=$HOME/.local/share/wallpapers
+  if [[ -d $dir/.git ]]; then
+    git -C "$dir" pull -q --ff-only || warn "could not update the wallpapers."
+  else
+    git clone -q --depth 1 https://github.com/henklr/wallpapers "$dir" ||
+      warn "could not fetch the wallpapers."
+  fi
+}
+
+install_webapps() {
+  step "Adding web apps"
+  local icons=https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png
+  local app name url icon
+  for app in \
+    "ChatGPT https://chatgpt.com/ chatgpt" \
+    "YouTube https://youtube.com/ youtube" \
+    "GitHub https://github.com/ github-light" \
+    "Discord https://discord.com/channels/@me discord"; do
+    read -r name url icon <<<"$app"
+    "$RIG_DIR/bin/rig-webapp" "$name" "$url" "$icons/$icon.png" ||
+      warn "could not add the web app $name."
+  done
 }
 
 # Keyboard and GPU belong to this machine, not to the repo. Git ignores this.
@@ -257,7 +294,10 @@ main() {
   attach_git_history
   install_packages
   install_aur_helper
+  install_aur_packages
   link_dotfiles
+  fetch_wallpapers
+  install_webapps
   write_machine_config
   configure_claude
   configure_snapshots

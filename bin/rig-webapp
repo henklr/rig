@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Adds a web app to the launcher, opened by Brave in its own window:
+#
+#   rig-webapp "Name" https://example.com https://example.com/icon.png
+set -Eeuo pipefail
+
+if (($# != 3)); then
+  echo 'usage: rig-webapp "Name" URL ICON_URL' >&2
+  exit 1
+fi
+name=$1 url=$2 icon_url=$3
+
+apps=$HOME/.local/share/applications
+icon=$apps/icons/$name.png
+
+mkdir -p "$apps/icons"
+curl -fsSL -o "$icon" "$icon_url"
+
+cat >"$apps/$name.desktop" <<DESKTOP
+[Desktop Entry]
+Version=1.0
+Name=$name
+Comment=$name
+Exec=brave --app=$url
+Terminal=false
+Type=Application
+Icon=$icon
+StartupNotify=true
+DESKTOP

@@ -1,0 +1,7 @@
+[font]
+normal = { family = "JetBrainsMono Nerd Font" }
+size = 12
+
+[window]
+decorations = "None"
+padding = { x = 10, y = 8 }

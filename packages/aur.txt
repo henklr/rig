@@ -1,0 +1,4 @@
+# Installed with yay after everything else. Nothing here may be needed to boot,
+# log in or reach Claude.
+brave-bin
+catppuccin-gtk-theme-mocha
