@@ -157,6 +157,11 @@ hl.bind(mod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mod .. " + up", hl.dsp.focus({ direction = "up" }))
 hl.bind(mod .. " + down", hl.dsp.focus({ direction = "down" }))
 
+hl.bind(mod .. " + SHIFT + left", hl.dsp.window.move({ direction = "left" }))
+hl.bind(mod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right" }))
+hl.bind(mod .. " + SHIFT + up", hl.dsp.window.move({ direction = "up" }))
+hl.bind(mod .. " + SHIFT + down", hl.dsp.window.move({ direction = "down" }))
+
 for i = 1, 10 do
     local key = i % 10 -- workspace 10 is on the 0 key
     hl.bind(mod .. " + " .. key, hl.dsp.focus({ workspace = i }))

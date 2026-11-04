@@ -51,6 +51,8 @@ Der er med vilje ikke meget tema eller opsætning. Det er det, der skal bygges n
 | `Super + Q` | Luk vindue |
 | `Super + F` / `V` | Fuld skærm / flydende vindue |
 | `Super + L` | Lås skærmen |
+| `Super + piletast` | Flyt fokus |
+| `Super + Shift + piletast` | Flyt vindue |
 | `Super + 1-0` | Skift workspace |
 | `Super + Shift + 1-0` | Flyt vindue til workspace |
 | `Super + Shift + V` | Udklipsholder-historik |
