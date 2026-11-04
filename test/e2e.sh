@@ -36,14 +36,14 @@ remote() {
 
 wait_for_ssh() {
   local i
-  for i in {1..120}; do
+  for i in {1..60}; do
     remote "$1@localhost" true 2>/dev/null && return 0
     sleep 5
   done
   fail "no SSH as $1 after 10 minutes. See serial-*.log and the screenshots."
 }
 
-monitor() { printf '%s\n' "$*" | socat -u - UNIX-CONNECT:monitor.sock; }
+monitor() { printf '%s\n' "$*" | socat -t 0.3 - UNIX-CONNECT:monitor.sock >>monitor.log 2>&1; }
 screenshot() {
   monitor "screendump $WORK/$1.png -f png"
   sleep 2
@@ -151,13 +151,24 @@ unlock_disk() {
   }
   screenshot 2-passphrase
   sleep 2
-  printf '%s\n' "$PASSWORD" | socat -u - UNIX-CONNECT:serial.sock
+  # One key at a time: QEMU drops whatever it hasn't read when the socket closes.
+  {
+    for ((i = 0; i < ${#PASSWORD}; i++)); do
+      printf '%s' "${PASSWORD:i:1}"
+      sleep 0.1
+    done
+    printf '\n'
+    sleep 2
+  } | socat -u - UNIX-CONNECT:serial.sock
   wait_for_ssh "$USERNAME"
+
+  grep -q 'Linux Boot Manager' serial-installed.log ||
+    fail "the firmware has no boot entry of its own, only the fallback path."
 }
 
 check_system() {
   say "Checking the installed system"
-  remote "$USERNAME@localhost" bash -ls <<'EOF' | tee checks.txt
+  remote "$USERNAME@localhost" "PASSWORD=$PASSWORD bash -ls" <<'EOF' | tee checks.txt
 ok()  { printf 'PASS  %s\n' "$1"; }
 bad() { printf 'FAIL  %s\n' "$1"; }
 check() { local name=$1; shift; if "$@" >/dev/null 2>&1; then ok "$name"; else bad "$name"; fi; }
@@ -187,6 +198,24 @@ check "config is linked from the repo" sh -c 'test "$(readlink -f ~/.config/hypr
 check "Hyprland accepts the config" sh -c 'Hyprland --verify-config 2>&1 | grep -q "config ok"'
 check "snapper has a baseline" sh -c 'snapper list | grep -q "fresh install"'
 check "pipewire is available" systemctl --user is-enabled pipewire.socket
+
+# What the README promises about pacman and snapshots.
+before=$(snapper list | wc -l)
+printf '%s\n' "$PASSWORD" | sudo -S pacman -S --noconfirm --needed tree >/dev/null 2>&1
+after=$(snapper list | wc -l)
+snapper list | tail -4
+if ((after >= before + 2)); then ok "pacman made a pre and post snapshot"; else bad "pacman made a pre and post snapshot"; fi
+
+# rig-askpass names the command by reading its parent, so that parent must be sudo.
+cat >/tmp/fake-askpass <<FAKE
+#!/bin/sh
+ps -o args= -p "\$PPID" >/tmp/askpass-parent
+echo "$PASSWORD"
+FAKE
+chmod +x /tmp/fake-askpass
+sudo -k
+SUDO_ASKPASS=/tmp/fake-askpass sudo -A true
+check "askpass can see the sudo command" grep -q '^sudo -A true$' /tmp/askpass-parent
 EOF
   grep -q '^FAIL' checks.txt && fail "some checks failed, see above."
   return 0

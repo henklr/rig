@@ -49,7 +49,12 @@ build_initramfs() {
 }
 
 install_bootloader() {
-  bootctl install --esp-path=/boot
+  # In a chroot bootctl skips the firmware's boot list unless told otherwise. That
+  # boots through the fallback path only, which loses to Windows on a second disk.
+  bootctl install --esp-path=/boot --variables=yes || {
+    warn "could not add a firmware boot entry, using the fallback path."
+    bootctl install --esp-path=/boot
+  }
   cat >/boot/loader/loader.conf <<'EOF'
 default arch.conf
 timeout 3
