@@ -32,13 +32,13 @@ Har du allerede installeret Arch, virker den samme kommando. Den rører ikke din
 |---|---|
 | Disk | LUKS2-kryptering, btrfs med snapshots før og efter hver pacman-kørsel |
 | Boot | systemd-boot, zram som swap |
-| Skrivebord | Hyprland, Hyprpaper, Waybar, Fuzzel, Mako, Hyprlock, Hypridle |
+| Skrivebord | Hyprland, Waybar, Fuzzel, Mako, Hyprlock, Hypridle |
 | Programmer | Alacritty, Brave, Nemo, Thunderbird, Neovim, tmux |
 | Lyd og net | PipeWire, NetworkManager, Bluetooth |
-| AUR | yay, Brave, Catppuccin-temaet |
+| AUR | yay, Brave |
 | Copilot | Claude Code, installeret før alt andet på grundsystemet |
 
-Udseende og taster kommer fra mine gamle dotfiles. Resten skal bygges nu.
+Programmer, vinduer og taster kommer fra mine gamle dotfiles. Resten skal bygges nu.
 
 ## Taster
 

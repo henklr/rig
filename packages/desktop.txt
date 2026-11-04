@@ -10,14 +10,12 @@ qt6-wayland
 
 # Desktop shell
 waybar
-hyprpaper
 fuzzel
 mako
 hypridle
 hyprlock
 hyprpicker
 adwaita-cursors
-papirus-icon-theme
 
 # Screenshots and clipboard
 grim

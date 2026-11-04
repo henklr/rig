@@ -28,7 +28,6 @@ hl.monitor({
 hl.env("XCURSOR_THEME", "Adwaita")
 hl.env("XCURSOR_SIZE", "18")
 hl.env("HYPRCURSOR_SIZE", "18")
-hl.env("GTK_THEME", "catppuccin-mocha-blue-standard+default")
 
 
 -----------------
@@ -73,13 +72,11 @@ hl.workspace_rule({ workspace = "special:copilot", gaps_out = 48 })
 
 hl.on("hyprland.start", function()
     hl.exec_cmd("waybar")
-    hl.exec_cmd("hyprpaper")
     hl.exec_cmd("mako")
     hl.exec_cmd("hypridle")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
     hl.exec_cmd("wl-paste --watch cliphist store")
     hl.exec_cmd("gsettings set org.gnome.desktop.interface color-scheme prefer-dark")
-    hl.exec_cmd("gsettings set org.gnome.desktop.interface icon-theme Papirus")
 
     -- The installer leaves this flag once: the first login lands in Claude.
     local flag = home .. "/.local/state/rig/first-boot"
@@ -234,12 +231,6 @@ hl.window_rule({
     no_focus = true,
 })
 
-hl.layer_rule({
-    name  = "waybar-blur",
-    match = { namespace = "^waybar$" },
-    blur  = true,
-    ignore_alpha = 0,
-})
 
 
 -----------------
