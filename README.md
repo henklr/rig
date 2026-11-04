@@ -4,7 +4,7 @@ Mit eget Linux-system: Arch og Hyprland, med Claude Code som systemets copilot. 
 
 ## Installation
 
-Boot Arch-ISO'en i UEFI-tilstand, og vælg dansk tastatur, hvis du vil have `-` og `|` de rigtige steder:
+Slå Secure Boot fra i BIOS, og boot Arch-ISO'en i UEFI-tilstand. Vælg dansk tastatur, hvis du vil have `-` og `|` de rigtige steder:
 
 ```bash
 loadkeys dk
@@ -22,7 +22,7 @@ Kør så:
 curl -fsSL https://github.com/henklr/rig/raw/main/install.sh | bash
 ```
 
-Du bliver spurgt om brugernavn, adgangskode og hvilken disk, Arch skal på, og den disk bliver **slettet helt**. Du skal skrive diskens navn for at bekræfte. Bagefter kører resten af sig selv. Log ind efter genstart, så starter Hyprland med Claude på skærmen, klar til at logge ind på din konto.
+Du bliver spurgt om brugernavn, adgangskode og hvilken disk, Arch skal på, og den disk bliver **slettet helt**. Den samme adgangskode bruges til login, sudo og diskkryptering. Du skal skrive diskens navn for at bekræfte. Bagefter kører resten af sig selv. Log ind efter genstart, så starter Hyprland med Claude på skærmen, klar til at logge ind på din konto.
 
 Har du allerede installeret Arch, virker den samme kommando. Den rører ikke din disk og lægger kun skrivebordet ovenpå.
 
