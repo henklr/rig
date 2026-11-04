@@ -1,0 +1,45 @@
+# Compositor and what it needs. No uwsm or display manager: tty1 login starts
+# start-hyprland from shell/bash_profile, which is the fewest moving parts.
+hyprland
+mesa
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+hyprpolkitagent
+qt5-wayland
+qt6-wayland
+
+# Desktop shell
+waybar
+fuzzel
+mako
+hypridle
+hyprlock
+hyprpicker
+adwaita-cursors
+
+# Screenshots and clipboard
+grim
+slurp
+wl-clipboard
+cliphist
+
+# Sound
+pipewire
+pipewire-alsa
+pipewire-jack
+pipewire-pulse
+wireplumber
+pavucontrol
+playerctl
+
+# Hardware
+bluez
+bluez-utils
+blueman
+brightnessctl
+network-manager-applet
+
+# Fonts
+noto-fonts
+noto-fonts-emoji
+ttf-jetbrains-mono-nerd

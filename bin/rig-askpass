@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Password popup for `sudo -A`. Claude's shell has no terminal to type a password
+# in, so instead of giving it passwordless root, every root command goes through
+# you. The popup names the command, so you can see what you're approving.
+[[ -n ${WAYLAND_DISPLAY:-} ]] || {
+  echo "rig-askpass: no desktop session to ask on. Run the command yourself." >&2
+  exit 1
+}
+command=$(ps -o args= -p "$PPID" 2>/dev/null)
+command=${command#sudo -A }
+exec fuzzel --dmenu --password --width=90 --prompt-only="sudo: ${command:0:70}  "

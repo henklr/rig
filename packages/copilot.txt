@@ -1,0 +1,11 @@
+# Claude's hands. Installed right after Claude Code itself.
+bubblewrap       # with socat: lets /sandbox work
+socat
+github-cli
+jq
+ripgrep
+fd
+nodejs           # npx and uvx start most MCP servers
+npm
+python
+uv

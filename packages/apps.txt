@@ -1,0 +1,7 @@
+ghostty
+firefox          # also what Claude's first login opens in
+imv
+mpv
+thunar
+xdg-user-dirs
+xdg-utils

@@ -1,0 +1,14 @@
+# Lives in ~/rig/shell. Login shells start here.
+export PATH="$HOME/.local/bin:$PATH"
+export EDITOR=nvim
+export VISUAL=nvim
+export SUDO_ASKPASS="$HOME/.local/bin/rig-askpass"
+
+[[ -f ~/.bashrc ]] && . ~/.bashrc
+
+# Logging in on tty1 starts the desktop. A clean exit logs out again. If Hyprland
+# fails you stay in this shell, where `claude` can help work out why.
+if [[ -z ${WAYLAND_DISPLAY:-} && ${XDG_VTNR:-} == 1 ]] && command -v start-hyprland >/dev/null; then
+  start-hyprland && exit
+  echo "Hyprland stopped with an error. Try: claude"
+fi

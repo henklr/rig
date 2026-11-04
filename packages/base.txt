@@ -1,0 +1,16 @@
+# Installed by pacstrap from the ISO. Only what a bootable system needs.
+# CPU microcode is added by install/iso.sh.
+base
+base-devel
+linux
+linux-firmware
+sof-firmware
+btrfs-progs
+cryptsetup
+networkmanager
+zram-generator
+sudo
+curl
+git
+man-db
+man-pages

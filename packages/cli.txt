@@ -1,0 +1,14 @@
+bash-completion
+bat
+btop
+eza
+fastfetch
+fzf
+neovim
+openssh
+starship
+tmux
+unzip
+wget
+zip
+zoxide
