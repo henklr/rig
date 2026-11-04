@@ -1,7 +1,8 @@
-ghostty
-firefox          # also what Claude's first login opens in
+alacritty
+firefox          # the fallback if Brave from the AUR fails: Claude's first login needs a browser
 imv
 mpv
-thunar
+nemo
+thunderbird
 xdg-user-dirs
 xdg-utils

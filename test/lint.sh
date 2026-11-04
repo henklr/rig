@@ -16,12 +16,20 @@ sed -i 's/^#\?ParallelDownloads.*/ParallelDownloads = 8/' /etc/pacman.conf
 pacman -Syu --noconfirm >/dev/null
 
 step "Package names"
-mapfile -t packages < <(read_pkgs packages/*.txt)
+mapfile -t packages < <(read_pkgs packages/{base,copilot,cli,desktop,apps}.txt)
 packages+=(snapper snap-pac nvidia-open-dkms nvidia-utils libva-nvidia-driver
   linux-headers vulkan-radeon vulkan-intel intel-media-driver amd-ucode intel-ucode)
 # --print resolves every name and dependency without installing anything.
 pacman -Sp --print-format '%n' "${packages[@]}" >/dev/null
 info "${#packages[@]} packages resolve"
+
+step "AUR package names"
+pacman -S "${pacman_options[@]}" jq >/dev/null
+mapfile -t aur < <(read_pkgs packages/aur.txt)
+query=$(printf '&arg[]=%s' "${aur[@]}")
+found=$(curl -fsS "https://aur.archlinux.org/rpc/v5/info?${query#&}" | jq .resultcount)
+((found == ${#aur[@]})) || die "only $found of ${#aur[@]} AUR packages exist."
+info "${#aur[@]} packages exist"
 
 step "shellcheck"
 pacman -S "${pacman_options[@]}" shellcheck >/dev/null
@@ -29,12 +37,11 @@ shellcheck -x -P SCRIPTDIR/.. install.sh install/*.sh test/*.sh bin/*
 info "clean"
 
 step "Claude settings"
-pacman -S "${pacman_options[@]}" jq >/dev/null
 jq empty claude/settings.json
 info "valid JSON"
 
 step "Desktop configs, checked by the programs that read them"
-pacman -S "${pacman_options[@]}" hyprland ghostty fuzzel waybar >/dev/null
+pacman -S "${pacman_options[@]}" hyprland alacritty fuzzel waybar >/dev/null
 
 # Hyprland refuses to run as root, and the checks need a home with these
 # configs in place, as the installer would leave it.
@@ -55,8 +62,8 @@ printf '%s\n' "$output" | tail -5
 grep -qi 'config ok' <<<"$output" || die "Hyprland rejected the config."
 grep -qiE 'error|failed' <<<"$output" && die "Hyprland reported a problem."
 
-as_user ghostty +validate-config || die "Ghostty rejected its config."
-info "ghostty ok"
+as_user alacritty migrate --dry-run --silent || die "Alacritty rejected its config."
+info "alacritty ok"
 
 as_user fuzzel --check-config || die "fuzzel rejected its config."
 info "fuzzel ok"

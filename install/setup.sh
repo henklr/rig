@@ -145,6 +145,16 @@ install_aur_helper() {
   rm -rf "$dir"
 }
 
+# This can fail without stopping the install: Firefox is the fallback browser.
+install_aur_packages() {
+  command -v yay >/dev/null || return 0
+  step "Installing from the AUR"
+  local -a packages
+  mapfile -t packages < <(read_pkgs "$RIG_DIR/packages/aur.txt")
+  yay -S --needed --noconfirm "${packages[@]}" ||
+    warn "could not install ${packages[*]}. Claude can try again later."
+}
+
 # link SOURCE_IN_REPO TARGET_IN_HOME: the config stays in ~/rig under git, so
 # whatever you and Claude change is versioned. Anything in the way is kept.
 link() {
@@ -160,7 +170,7 @@ link() {
 link_dotfiles() {
   step "Linking the configuration"
   local path
-  for path in "$RIG_DIR"/config/*/; do
+  for path in "$RIG_DIR"/config/*; do
     path=$(basename "$path")
     link "config/$path" ".config/$path"
   done
@@ -257,6 +267,7 @@ main() {
   attach_git_history
   install_packages
   install_aur_helper
+  install_aur_packages
   link_dotfiles
   write_machine_config
   configure_claude

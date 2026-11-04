@@ -10,7 +10,7 @@ Et personligt Arch + Hyprland-system. Repoet er kilden til hele systemet: Hvis e
 | `install/iso.sh` | Som root på ISO'en: disk, LUKS, btrfs, pacstrap |
 | `install/chroot.sh` | Som root i det nye system: locale, bruger, bootloader |
 | `install/setup.sh` | Som brugeren: Claude Code først, derefter skrivebordet. Kan køres igen |
-| `packages/*.txt` | Alt, der er installeret, en pakke pr. linje |
+| `packages/*.txt` | Alt, der er installeret, en pakke pr. linje. `aur.txt` installeres med yay og må gerne fejle |
 | `config/<navn>/` | Symlinket til `~/.config/<navn>` |
 | `bin/` | Symlinket til `~/.local/bin` |
 | `shell/` | Symlinket til `~/.bashrc` og `~/.bash_profile` |

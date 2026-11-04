@@ -33,12 +33,12 @@ Har du allerede installeret Arch, virker den samme kommando. Den rører ikke din
 | Disk | LUKS2-kryptering, btrfs med snapshots før og efter hver pacman-kørsel |
 | Boot | systemd-boot, zram som swap |
 | Skrivebord | Hyprland, Waybar, Fuzzel, Mako, Hyprlock, Hypridle |
-| Programmer | Ghostty, Firefox, Thunar, Neovim, tmux |
+| Programmer | Alacritty, Brave, Nemo, Thunderbird, Neovim, tmux |
 | Lyd og net | PipeWire, NetworkManager, Bluetooth |
-| AUR | yay |
+| AUR | yay, Brave |
 | Copilot | Claude Code, installeret før alt andet på grundsystemet |
 
-Der er med vilje ikke meget tema eller opsætning. Det er det, der skal bygges nu.
+Programmer, vinduer og taster kommer fra mine gamle dotfiles. Resten skal bygges nu.
 
 ## Taster
 
@@ -47,12 +47,15 @@ Der er med vilje ikke meget tema eller opsætning. Det er det, der skal bygges n
 | `Super + A` | **Vis eller skjul Claude** |
 | `Super + Return` | Terminal |
 | `Super + Space` | Programmenu |
-| `Super + B` / `E` | Firefox / filer |
+| `Super + B` / `F` | Brave / filer |
 | `Super + Q` | Luk vindue |
-| `Super + F` / `V` | Fuld skærm / flydende vindue |
+| `Super + Shift + F` | Fuld skærm |
+| `Super + V` | Flydende vindue |
+| `Super + P` / `J` | Pseudotile / skift split |
 | `Super + L` | Lås skærmen |
 | `Super + piletast` | Flyt fokus |
-| `Super + Shift + piletast` | Flyt vindue |
+| `Super + Shift + piletast` | Byt vinduer |
+| `Super + S` / `Super + Shift + S` | Vis scratchpad / flyt vindue dertil |
 | `Super + 1-0` | Skift workspace |
 | `Super + Shift + 1-0` | Flyt vindue til workspace |
 | `Super + Shift + V` | Udklipsholder-historik |

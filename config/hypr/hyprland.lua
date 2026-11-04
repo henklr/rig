@@ -6,13 +6,11 @@
 local home = os.getenv("HOME")
 local mod = "SUPER"
 
-local terminal = "ghostty"
+local terminal = "alacritty"
 local launcher = "fuzzel"
-local browser = "firefox"
-local files = "thunar"
+local browser = "brave"
+local files = "nemo"
 
-local accent = "rgba(d97757ee)"
-local muted = "rgba(3a3a40aa)"
 local background = 0xff141416
 
 
@@ -24,12 +22,12 @@ hl.monitor({
     output   = "",
     mode     = "preferred",
     position = "auto",
-    scale    = "auto",
+    scale    = 1,
 })
 
 hl.env("XCURSOR_THEME", "Adwaita")
-hl.env("XCURSOR_SIZE", "24")
-hl.env("HYPRCURSOR_SIZE", "24")
+hl.env("XCURSOR_SIZE", "18")
+hl.env("HYPRCURSOR_SIZE", "18")
 
 
 -----------------
@@ -97,23 +95,35 @@ end)
 
 hl.config({
     general = {
-        gaps_in     = 4,
-        gaps_out    = 10,
-        border_size = 2,
+        gaps_in     = 0,
+        gaps_out    = 0,
+        border_size = 1,
         col = {
-            active_border   = accent,
-            inactive_border = muted,
+            active_border   = { colors = { "rgba(33ccffee)", "rgba(00ff99ee)" }, angle = 45 },
+            inactive_border = "rgba(595959aa)",
         },
         layout = "dwindle",
     },
 
     decoration = {
-        rounding = 8,
-        blur     = { enabled = false },
-        shadow   = { enabled = false },
+        rounding         = 0,
+        active_opacity   = 0.975,
+        inactive_opacity = 0.75,
+        shadow = {
+            enabled      = true,
+            range        = 4,
+            render_power = 3,
+            color        = "rgba(1a1a1aee)",
+        },
+        blur = {
+            enabled  = true,
+            size     = 5,
+            passes   = 3,
+            vibrancy = 0.2,
+        },
     },
 
-    animations = { enabled = true },
+    animations = { enabled = false },
 
     dwindle = { preserve_split = true },
 
@@ -125,13 +135,13 @@ hl.config({
     },
 
     input = {
-        follow_mouse = 1,
-        touchpad     = { natural_scroll = true },
+        follow_mouse   = 1,
+        sensitivity    = 0.5,
+        natural_scroll = true,
+        accel_profile  = "flat",
+        touchpad       = { natural_scroll = true },
     },
 })
-
-hl.curve("snappy", { type = "bezier", points = { { 0.23, 1 }, { 0.32, 1 } } })
-hl.animation({ leaf = "global", enabled = true, speed = 4, bezier = "snappy" })
 
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
@@ -144,12 +154,14 @@ hl.bind(mod .. " + A", toggle_copilot)
 hl.bind(mod .. " + Return", hl.dsp.exec_cmd(terminal))
 hl.bind(mod .. " + Space", hl.dsp.exec_cmd(launcher))
 hl.bind(mod .. " + B", hl.dsp.exec_cmd(browser))
-hl.bind(mod .. " + E", hl.dsp.exec_cmd(files))
+hl.bind(mod .. " + F", hl.dsp.exec_cmd(files))
 hl.bind(mod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 
 hl.bind(mod .. " + Q", hl.dsp.window.close())
-hl.bind(mod .. " + F", hl.dsp.window.fullscreen())
+hl.bind(mod .. " + SHIFT + F", hl.dsp.window.fullscreen())
 hl.bind(mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mod .. " + P", hl.dsp.window.pseudo())
+hl.bind(mod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mod .. " + SHIFT + E", hl.dsp.exit())
 
 hl.bind(mod .. " + left", hl.dsp.focus({ direction = "left" }))
@@ -157,16 +169,19 @@ hl.bind(mod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mod .. " + up", hl.dsp.focus({ direction = "up" }))
 hl.bind(mod .. " + down", hl.dsp.focus({ direction = "down" }))
 
-hl.bind(mod .. " + SHIFT + left", hl.dsp.window.move({ direction = "left" }))
-hl.bind(mod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right" }))
-hl.bind(mod .. " + SHIFT + up", hl.dsp.window.move({ direction = "up" }))
-hl.bind(mod .. " + SHIFT + down", hl.dsp.window.move({ direction = "down" }))
+hl.bind(mod .. " + SHIFT + left", hl.dsp.window.swap({ direction = "left" }))
+hl.bind(mod .. " + SHIFT + right", hl.dsp.window.swap({ direction = "right" }))
+hl.bind(mod .. " + SHIFT + up", hl.dsp.window.swap({ direction = "up" }))
+hl.bind(mod .. " + SHIFT + down", hl.dsp.window.swap({ direction = "down" }))
 
 for i = 1, 10 do
     local key = i % 10 -- workspace 10 is on the 0 key
     hl.bind(mod .. " + " .. key, hl.dsp.focus({ workspace = i }))
     hl.bind(mod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
+
+hl.bind(mod .. " + S", hl.dsp.workspace.toggle_special("magic"))
+hl.bind(mod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
 
 hl.bind(mod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
@@ -215,6 +230,7 @@ hl.window_rule({
     },
     no_focus = true,
 })
+
 
 
 -----------------
