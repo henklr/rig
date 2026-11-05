@@ -312,6 +312,15 @@ hyprctl clients -j | jq -r --argjson id "$1" \
 EOF
 }
 
+# Prints where the oldest window on the first workspace is.
+first_window() {
+  remote "$USERNAME@localhost" bash -ls <<'EOF'
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "$XDG_RUNTIME_DIR/hypr" | head -1)
+hyprctl clients -j | jq -c 'map(select(.workspace.id == 1))[0] | [.at, .size]'
+EOF
+}
+
 expect_floating() {
   local state
   state=$(floating_state "$1")
@@ -322,8 +331,11 @@ check_floating() {
   say "Pressing Super + T to make the workspace float"
   monitor "sendkey meta_l-a" # Claude was showing, and it would get the new window
   sleep 3
+  local tiled
+  tiled=$(first_window)
   monitor "sendkey meta_l-t"
   sleep 3
+  [[ $(first_window) == "$tiled" ]] || fail "Super + T moved a window from $tiled to $(first_window)."
   monitor "sendkey meta_l-ret"
   sleep 10
   screenshot a-floating

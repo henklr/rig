@@ -96,7 +96,12 @@ function toggle_floating()
     local action = floating and "enable" or "disable"
     rule:set_enabled(floating)
     for _, window in ipairs(workspace:get_windows()) do
+        local at, size = window.at, window.size
         hl.dispatch(hl.dsp.window.float({ action = action, window = window }))
+        if floating then -- Hyprland centers it, partly under the bar
+            hl.dispatch(hl.dsp.window.resize({ x = size.x, y = size.y, window = window }))
+            hl.dispatch(hl.dsp.window.move({ x = at.x, y = at.y, window = window }))
+        end
     end
     hl.notification.create({ text = floating and "Flydende vinduer" or "Tiling", timeout = 1500 })
 end
