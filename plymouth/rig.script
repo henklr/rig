@@ -1,87 +1,77 @@
 # The disk password prompt at boot, made to look like config/hypr/hyprlock.conf,
 # so change them together. Plymouth has no clock, which is the only difference.
 # install/setup.sh fills in the username: the initramfs has no user database.
+# It has no locale either, so text must be ASCII and the dots are images.
 
 username = "@USER@";
+max_dots = 20;
+dot_pitch = 14;
+bullets = 0;
 
 Window.SetBackgroundTopColor (0.078, 0.078, 0.086);
 Window.SetBackgroundBottomColor (0.078, 0.078, 0.086);
 
-center_x = Window.GetX () + Window.GetWidth () / 2;
-center_y = Window.GetY () + Window.GetHeight () / 2;
-
-field.width = 300;
-field.height = 48;
-field.border = 2;
-field.x = center_x - field.width / 2;
-field.y = center_y + 20 - field.height / 2;
-field.z = 10;
-
 fun text (string, size, gray)
   {
-    return Image.Text (string, gray, gray, gray, 1, "JetBrainsMono Nerd Font " + size);
+    return Sprite (Image.Text (string, gray, gray, gray, 1, "JetBrainsMono Nerd Font " + size));
   }
 
-fun place_centered (sprite, image, y)
+fun place (sprite, x, y)
   {
-    sprite.SetImage (image);
-    sprite.SetPosition (center_x - image.GetWidth () / 2, y - image.GetHeight () / 2, field.z + 1);
-    sprite.SetOpacity (1);
-  }
-
-fun border_line (x, y, width, height)
-  {
-    local.pixel = Image ("pixel.png");
-    local.sprite = Sprite (pixel.Scale (width, height));
-    sprite.SetPosition (x, y, field.z);
-    return sprite;
+    local.image = sprite.GetImage ();
+    sprite.SetPosition (x - image.GetWidth () / 2, y - image.GetHeight () / 2, 10);
   }
 
 fun dialog_setup ()
   {
-    local.lines;
-    lines[0] = border_line (field.x, field.y, field.width, field.border);
-    lines[1] = border_line (field.x, field.y + field.height - field.border, field.width, field.border);
-    lines[2] = border_line (field.x, field.y, field.border, field.height);
-    lines[3] = border_line (field.x + field.width - field.border, field.y, field.border, field.height);
+    global.dialog.name = text (global.username, "24", 0.9);
+    global.dialog.field = Sprite (Image ("field.png"));
+    global.dialog.placeholder = text ("Password", "13", 0.54);
 
-    local.name = Sprite ();
-    place_centered (name, text (global.username, "24", 0.9), global.center_y - 50);
+    local.dot = Image ("dot.png");
+    for (index = 0; index < global.max_dots; index++)
+      global.dialog.dots[index] = Sprite (dot);
+  }
 
-    global.dialog.lines = lines;
-    global.dialog.name = name;
-    global.dialog.placeholder = Sprite ();
-    global.dialog.dots = Sprite ();
-    place_centered (global.dialog.placeholder, text ("Password", "13", 0.54), global.center_y + 20);
+# Screens can appear after this script has started, and every screen is centered
+# in the largest one, so the middle has to be measured each time.
+fun dialog_place ()
+  {
+    local.x = Window.GetX () + Window.GetWidth () / 2;
+    local.y = Window.GetY () + Window.GetHeight () / 2;
+
+    place (dialog.name, x, y - 50);
+    place (dialog.field, x, y + 20);
+    place (dialog.placeholder, x, y + 20);
+    for (index = 0; index < global.max_dots; index++)
+      place (dialog.dots[index], x + global.dot_pitch * (index - (global.bullets - 1) / 2), y + 20);
   }
 
 fun dialog_opacity (opacity)
   {
-    for (index = 0; index < 4; index++)
-      dialog.lines[index].SetOpacity (opacity);
     dialog.name.SetOpacity (opacity);
-    dialog.placeholder.SetOpacity (opacity);
-    dialog.dots.SetOpacity (opacity);
+    dialog.field.SetOpacity (opacity);
+
+    if (global.bullets == 0)
+      dialog.placeholder.SetOpacity (opacity);
+    else
+      dialog.placeholder.SetOpacity (0);
+
+    for (index = 0; index < global.max_dots; index++)
+      if (index < global.bullets)
+        dialog.dots[index].SetOpacity (opacity);
+      else
+        dialog.dots[index].SetOpacity (0);
   }
 
-fun display_password_callback (prompt, bullets)
+fun display_password_callback (prompt, count)
   {
     if (!global.dialog)
       dialog_setup ();
-    dialog_opacity (1);
 
-    if (bullets == 0)
-      {
-        dialog.dots.SetOpacity (0);
-      }
-    else
-      {
-        dots = "";
-        for (index = 0; index < bullets && index < 24; index++)
-          dots = dots + "•";
-        dialog.placeholder.SetOpacity (0);
-        place_centered (dialog.dots, text (dots, "16", 0.9), global.center_y + 20);
-      }
+    global.bullets = Math.Min (count, global.max_dots);
+    dialog_place ();
+    dialog_opacity (1);
   }
 
 fun display_normal_callback ()
@@ -90,5 +80,12 @@ fun display_normal_callback ()
       dialog_opacity (0);
   }
 
+fun display_hotplug_callback ()
+  {
+    if (global.dialog)
+      dialog_place ();
+  }
+
 Plymouth.SetDisplayPasswordFunction (display_password_callback);
 Plymouth.SetDisplayNormalFunction (display_normal_callback);
+Plymouth.SetDisplayHotplugFunction (display_hotplug_callback);
