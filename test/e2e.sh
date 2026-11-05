@@ -60,7 +60,6 @@ type_keys() {
     monitor "sendkey $key"
     sleep 0.2
   done
-  monitor "sendkey ret"
 }
 
 start_vm() {
@@ -148,9 +147,15 @@ unlock_disk() {
   # The prompt is only on the screen now, so the serial port can't announce it.
   sleep 45
   screenshot 2-boot-screen
-  type_keys "$PASSWORD"
-  sleep 2
+  # Ctrl + Backspace has to clear this, or the password after it is wrong.
+  type_keys wrong
+  sleep 1
   screenshot 2-boot-screen-typed
+  monitor "sendkey ctrl-backspace"
+  sleep 1
+  screenshot 2-boot-screen-cleared
+  type_keys "$PASSWORD"
+  monitor "sendkey ret"
   wait_for_ssh "$USERNAME"
 
   grep -q 'Linux Boot Manager' serial-installed.log ||
@@ -297,6 +302,33 @@ EOF
   monitor "sendkey esc"
 }
 
+# Fails unless the login is in the middle of the screenshot, $2 x $3 pixels.
+check_centered() {
+  local box left top width height
+  box=$(convert "$1.png" -trim -format '%X %Y %w %h' info:)
+  read -r left top width height <<<"${box//+/}"
+  local across=$((2 * left + width - $2)) down=$((2 * top + height - $3))
+  if ((width < 300 || across <= -4 || across >= 4 || down <= -80 || down >= 80)); then
+    fail "$1 has the login at $box instead of the middle of $2x$3."
+  fi
+}
+
+# The monitor beside the T480s wakes up after Plymouth has started. It gets a
+# bigger screen in here, because that is what moves everything on the small one.
+check_late_screen() {
+  say "Connecting a larger screen at the password prompt"
+  monitor system_reset
+  sleep 45
+  monitor "device_add virtio-gpu-pci,id=late,xres=1920,yres=1080"
+  sleep 20
+  screenshot 3-boot-screen-small
+  monitor "screendump $WORK/3-boot-screen-large.png -f png late"
+  sleep 2
+  check_centered 2-boot-screen 1280 800
+  check_centered 3-boot-screen-small 1280 800
+  check_centered 3-boot-screen-large 1920 1080
+}
+
 # Prints what's on screen in a form the checks above can grep. An SSH session
 # isn't part of the desktop, so it has to find the running Hyprland first.
 desktop_state() {
@@ -355,4 +387,5 @@ check_system
 check_desktop
 check_rerun
 check_button
+check_late_screen
 say "Everything passed"
