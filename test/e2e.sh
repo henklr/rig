@@ -73,6 +73,7 @@ start_vm() {
     -drive file=disk.qcow2,if=virtio,format=qcow2 \
     -nic "user,model=virtio-net-pci,hostfwd=tcp::$SSH_PORT-:22" \
     -device virtio-vga -display none \
+    -device qemu-xhci -device usb-mouse \
     -chardev "socket,id=serial,path=serial.sock,server=on,wait=off,logfile=serial-$name.log" \
     -serial chardev:serial \
     -monitor unix:monitor.sock,server=on,wait=off \
@@ -275,9 +276,17 @@ EOF
   remote "$USERNAME@localhost" 'pgrep -x fuzzel >/dev/null' || fail "Super + M opened no menu."
   monitor "sendkey esc"
   sleep 2
+}
 
-  say "Clicking the rig button, which sits in the top right corner"
-  monitor "mouse_move 3000 -3000"
+# Last, so it also shows that the button survives Waybar reloading after an update.
+check_button() {
+  say "Clicking the rig button in Waybar"
+  remote "$USERNAME@localhost" bash -ls <<'EOF'
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "$XDG_RUNTIME_DIR/hypr" | head -1)
+hyprctl dispatch 'hl.dsp.cursor.move({ x = 1268, y = 15 })'
+EOF
+  monitor "mouse_move 1 0"
   sleep 1
   monitor "mouse_button 1"
   sleep 1
@@ -343,4 +352,5 @@ unlock_disk
 check_system
 check_desktop
 check_rerun
+check_button
 say "Everything passed"
