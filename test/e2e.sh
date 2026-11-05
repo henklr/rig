@@ -302,6 +302,58 @@ EOF
   monitor "sendkey esc"
 }
 
+# Prints how many windows float on a workspace.
+floating_state() {
+  remote "$USERNAME@localhost" bash -ls -s "$1" <<'EOF'
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "$XDG_RUNTIME_DIR/hypr" | head -1)
+hyprctl clients -j | jq -r --argjson id "$1" \
+  'map(select(.workspace.id == $id)) | "\(length) windows, \(map(select(.floating)) | length) floating"'
+EOF
+}
+
+expect_floating() {
+  local state
+  state=$(floating_state "$1")
+  [[ $state == "$2" ]] || fail "$3 Workspace $1 has $state, expected $2."
+}
+
+check_floating() {
+  say "Pressing Super + T to make the workspace float"
+  monitor "sendkey meta_l-a" # Claude was showing, and it would get the new window
+  sleep 3
+  monitor "sendkey meta_l-t"
+  sleep 3
+  monitor "sendkey meta_l-ret"
+  sleep 10
+  screenshot a-floating
+  expect_floating 1 "2 windows, 2 floating" "Super + T did not float every window."
+
+  say "Opening a window on the next workspace, which should still tile"
+  monitor "sendkey meta_l-2"
+  sleep 3
+  monitor "sendkey meta_l-ret"
+  sleep 10
+  expect_floating 2 "1 windows, 0 floating" "the floating leaked to another workspace."
+  monitor "sendkey meta_l-1"
+  sleep 3
+
+  say "Pressing Super + T to tile it again"
+  monitor "sendkey meta_l-t"
+  sleep 3
+  screenshot b-tiled
+  expect_floating 1 "2 windows, 0 floating" "Super + T did not tile the windows again."
+
+  say "Using what the menu runs"
+  remote "$USERNAME@localhost" bash -ls <<'EOF'
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "$XDG_RUNTIME_DIR/hypr" | head -1)
+eval "$(sed -n 's/^Flydende.*|//p' ~/rig/bin/rig-menu)"
+EOF
+  sleep 3
+  expect_floating 1 "2 windows, 2 floating" "the menu did not float the windows."
+}
+
 # Fails unless the login is in the middle of the screenshot, $2 x $3 pixels.
 check_centered() {
   local box left top width height
@@ -393,5 +445,6 @@ check_system
 check_desktop
 check_rerun
 check_button
+check_floating
 check_late_screen
 say "Everything passed"
