@@ -317,6 +317,8 @@ check_centered() {
 # bigger screen in here, because that is what moves everything on the small one.
 check_late_screen() {
   say "Connecting a larger screen at the password prompt"
+  # A reset skips the flush, and the rerun has just rewritten the initramfs.
+  remote "$USERNAME@localhost" sync
   monitor system_reset
   sleep 45
   monitor "device_add virtio-gpu-pci,id=late,xres=1920,yres=1080"
