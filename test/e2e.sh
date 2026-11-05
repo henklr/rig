@@ -296,12 +296,20 @@ curl -fsSL "https://github.com/$REPO/raw/$BRANCH/install.sh" |
 echo "exit: $?"
 tail -6 /tmp/rerun.log
 grep -c 'could not update' /tmp/rerun.log | sed 's/^/update warnings: /'
+
+# What the README says to run: it must fetch what's new on its own.
+git -C "$HOME/rig" reset -q --hard HEAD~1
+"$HOME/rig/install.sh" >/tmp/rerun-local.log 2>&1
+echo "local exit: $?"
+echo "behind: $(git -C "$HOME/rig" rev-list --count 'HEAD..@{upstream}')"
 sudo rm -f "$rule"
 echo "repo changes: [$(git -C "$HOME/rig" status --porcelain)]"
 if [[ -e ~/.local/state/rig/first-boot ]]; then echo "flag: there"; else echo "flag: gone"; fi
 EOF
   grep -q '^exit: 0$' rerun.txt || fail "the installer failed on an installed system."
   grep -q '^update warnings: 0$' rerun.txt || fail "a second run could not update ~/rig."
+  grep -q '^local exit: 0$' rerun.txt || fail "~/rig/install.sh failed on an installed system."
+  grep -q '^behind: 0$' rerun.txt || fail "~/rig/install.sh did not fetch the newest commits."
   grep -q '^repo changes: \[\]$' rerun.txt || fail "a second run changed the repo."
   grep -q '^flag: gone$' rerun.txt || fail "a second run brought back the first-login flag."
 }

@@ -36,10 +36,14 @@ adopt_user() {
 
 # Everything is symlinked out of ~/rig, so the code has to live there even when
 # it came from a temporary download.
+# Runs the newest ~/rig, also when this script already is ~/rig/install/setup.sh.
 settle_in_home() {
-  [[ $RIG_DIR == "$HOME/rig" ]] && return 0
+  [[ -n ${RIG_SETTLED:-} ]] && return 0
+  export RIG_SETTLED=1
   if [[ -d $HOME/rig/.git ]]; then
     git -C "$HOME/rig" pull --ff-only || warn "could not update ~/rig, using it as it is."
+  elif [[ $RIG_DIR == "$HOME/rig" ]]; then
+    return 0 # the first install: setup.sh attaches the git history later
   elif [[ -e $HOME/rig ]]; then
     die "$HOME/rig already exists and is not a git checkout. Move it away first."
   else
