@@ -71,7 +71,7 @@ start_vm() {
     -drive if=pflash,format=raw,file=vars.fd \
     -drive file=disk.qcow2,if=virtio,format=qcow2 \
     -nic "user,model=virtio-net-pci,hostfwd=tcp::$SSH_PORT-:22" \
-    -device virtio-vga -display none \
+    -device virtio-vga -display none -parallel none \
     -device qemu-xhci -device usb-mouse \
     -chardev "socket,id=serial,path=serial.sock,server=on,wait=off,logfile=serial-$name.log" \
     -serial chardev:serial \
