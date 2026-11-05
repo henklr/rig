@@ -1,0 +1,9 @@
+[Plymouth Theme]
+Name=rig
+Description=The disk password prompt, made to look like the lock screen
+ModuleName=script
+Font=JetBrainsMono Nerd Font
+
+[script]
+ImageDir=/usr/share/plymouth/themes/rig
+ScriptFile=/usr/share/plymouth/themes/rig/rig.script

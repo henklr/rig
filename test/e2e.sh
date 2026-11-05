@@ -15,7 +15,7 @@ OVMF_CODE=/usr/share/OVMF/OVMF_CODE_4M.fd
 OVMF_VARS=/usr/share/OVMF/OVMF_VARS_4M.fd
 SSH_PORT=2222
 USERNAME=tester
-PASSWORD=rigtestpassword # letters only: it gets typed on a virtual keyboard
+PASSWORD=rig-test-password # the dashes are on purpose, see type_keys
 VM_PID=
 
 mkdir -p "$WORK"
@@ -47,6 +47,20 @@ monitor() { printf '%s\n' "$*" | socat -t 0.3 - UNIX-CONNECT:monitor.sock >>moni
 screenshot() {
   monitor "screendump $WORK/$1.png -f png"
   sleep 2
+}
+
+# Types on the VM's keyboard, as a person at the machine would. QEMU names keys by
+# their place on a US keyboard, and slash is where a Danish keyboard has its dash,
+# so the password only works if the Danish layout reached the boot screen.
+type_keys() {
+  local i key
+  for ((i = 0; i < ${#1}; i++)); do
+    key=${1:i:1}
+    [[ $key == - ]] && key=slash
+    monitor "sendkey $key"
+    sleep 0.2
+  done
+  monitor "sendkey ret"
 }
 
 start_vm() {
@@ -108,7 +122,7 @@ install_from_iso() {
   say "Running the one-line installer"
   remote root@localhost "env RIG_DISK=/dev/vda RIG_USER=$USERNAME RIG_PASSWORD=$PASSWORD \
     RIG_HOSTNAME=e2e RIG_ENCRYPT=yes RIG_KEYMAP=dk RIG_TIMEZONE=Europe/Copenhagen \
-    RIG_LOCALE=en_DK.UTF-8 RIG_YES=1 RIG_NO_REBOOT=1 RIG_KERNEL_ARGS=console=ttyS0 \
+    RIG_LOCALE=en_DK.UTF-8 RIG_YES=1 RIG_NO_REBOOT=1 RIG_KERNEL_ARGS='console=ttyS0 plymouth.ignore-serial-consoles' \
     RIG_REPO=$REPO RIG_BRANCH=$BRANCH \
     bash -c 'curl -fsSL https://github.com/$REPO/raw/$BRANCH/install.sh | bash'" | tee install.log
 
@@ -130,26 +144,12 @@ EOF
 unlock_disk() {
   say "Rebooting without the ISO and unlocking the disk"
   start_vm installed
-  local i
-  for i in {1..120}; do
-    grep -qi passphrase serial-installed.log 2>/dev/null && break
-    sleep 2
-  done
-  grep -qi passphrase serial-installed.log || {
-    screenshot 2-no-passphrase-prompt
-    fail "never asked for the disk passphrase."
-  }
-  screenshot 2-passphrase
+  # The prompt is only on the screen now, so the serial port can't announce it.
+  sleep 45
+  screenshot 2-boot-screen
+  type_keys "$PASSWORD"
   sleep 2
-  # One key at a time: QEMU drops whatever it hasn't read when the socket closes.
-  {
-    for ((i = 0; i < ${#PASSWORD}; i++)); do
-      printf '%s' "${PASSWORD:i:1}"
-      sleep 0.1
-    done
-    printf '\n'
-    sleep 2
-  } | socat -u - UNIX-CONNECT:serial.sock
+  screenshot 2-boot-screen-typed
   wait_for_ssh "$USERNAME"
 
   grep -q 'Linux Boot Manager' serial-installed.log ||
@@ -209,6 +209,8 @@ SUDO_ASKPASS=/tmp/fake-askpass sudo -A true
 check "askpass can see the sudo command" grep -q '^sudo -A true$' /tmp/askpass-parent
 
 check "boot menu is hidden" sh -c 'printf "%s\n" "$PASSWORD" | sudo -S grep -q "^timeout 0" /boot/loader/loader.conf'
+check "boot screen is in the initramfs" sh -c 'printf "%s\n" "$PASSWORD" | sudo -S lsinitcpio /boot/initramfs-linux.img | grep -q themes/rig/rig.script'
+check "boot screen is switched on" grep -q splash /proc/cmdline
 EOF
   grep -q '^FAIL' checks.txt && fail "some checks failed, see above."
   return 0

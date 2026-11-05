@@ -8,6 +8,9 @@ hyprpolkitagent
 qt5-wayland
 qt6-wayland
 
+# The login screen at boot, which is really the disk password prompt
+plymouth
+
 # Desktop shell
 waybar
 fuzzel

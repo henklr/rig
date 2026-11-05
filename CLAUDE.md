@@ -13,6 +13,7 @@ Et personligt Arch + Hyprland-system. Repoet er kilden til hele systemet: Hvis e
 | `packages/*.txt` | Alt, der er installeret, en pakke pr. linje. `aur.txt` installeres med yay og må gerne fejle |
 | `config/<navn>/` | Symlinket til `~/.config/<navn>` |
 | `bin/` | Symlinket til `~/.local/bin` |
+| `plymouth/` | Login-skærmen ved opstart, kopieret til `/usr/share/plymouth/themes/rig` |
 | `shell/` | Symlinket til `~/.bashrc` og `~/.bash_profile` |
 | `claude/` | Claudes globale instruktioner og indstillinger |
 | `test/` | Tests, se nedenfor |
@@ -34,6 +35,7 @@ Vigtigt: Hyprland har skiftet config-sprog, og det meste, der står på nettet, 
 - `hyprlock` og `hypridle` bruger stadig det gamle `.conf`-format.
 - Kør `Hyprland --verify-config` efter hver ændring i configen.
 - Sessionen startes med `start-hyprland` fra `shell/bash_profile`, uden display manager eller uwsm. På en krypteret disk logger tty1 selv ind, så diskens adgangskode er den eneste ved opstart. Uden kryptering skal man logge ind.
+- Login-skærmen er Plymouths prompt til diskens adgangskode, tegnet i `plymouth/rig.script` så den ligner `hyprlock.conf`. Ændr dem sammen.
 
 ## Kendte huller
 

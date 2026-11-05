@@ -234,9 +234,9 @@ configure_snapshots() {
   sudo snapper --no-dbus -c root create -d "rig: fresh install"
 }
 
-# The disk password is the only one at boot: no menu before it and no login after
-# it. Without encryption that would mean no password at all, so tty1 only logs in
-# by itself when the root disk is encrypted.
+# The disk password is typed once, on a screen that looks like the lock screen,
+# and there's no menu before it and no login after it. Without encryption that
+# would mean no password at all, so all of this needs an encrypted root disk.
 configure_boot() {
   step "Setting up the boot"
   if sudo test -f /boot/loader/loader.conf; then
@@ -250,6 +250,23 @@ configure_boot() {
 ExecStart=
 ExecStart=-/usr/bin/agetty --noreset --noclear --autologin $USER - \${TERM}
 EOF
+  install_boot_screen
+}
+
+install_boot_screen() {
+  local hooks=/etc/mkinitcpio.conf.d/rig.conf entry=/boot/loader/entries/arch.conf
+  local theme=/usr/share/plymouth/themes/rig
+  if [[ ! -f $hooks ]] || ! sudo test -f "$entry"; then
+    info "this Arch wasn't installed by rig, keeping its boot as it is."
+    return 0
+  fi
+  sudo mkdir -p "$theme"
+  sudo cp "$RIG_DIR"/plymouth/* "$theme/"
+  sudo sed -i "s/@USER@/$USER/" "$theme/rig.script"
+  sudo plymouth-set-default-theme rig
+  sudo sed -i '/^HOOKS=/{/plymouth/!s/ systemd / systemd plymouth /}' "$hooks"
+  sudo sed -i '/^options/{/ splash/!s/$/ splash/}' "$entry"
+  sudo mkinitcpio -P
 }
 
 enable_services() {
