@@ -23,6 +23,7 @@ Et personligt Arch + Hyprland-system. Repoet er kilden til hele systemet: Hvis e
 - **Ændr i `~/rig`, ikke i `~/.config`.** Det er det samme sted på grund af symlinks, men en ny fil skal oprettes her for at komme med.
 - **En ny pakke skal i `packages/`.** Installér den og skriv den på listen i samme ændring, ellers forsvinder den ved næste installation.
 - **Kun maskinen selv:** Tastatur, skærme og GPU hører til i `config/hypr/machine.lua`, som installeren skriver, og som git ignorerer.
+- **Nye valg og indstillinger skal i menuen.** `bin/rig-menu` ligger bag knappen i Waybar og `Super + M`, og et nyt valg er én linje dér.
 - **Små commits.** Git er vejen tilbage, og brugeren skal kunne læse historikken.
 
 ## Hyprland

@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Updates rig and the system, then offers a restart if what changed needs one.
+# rig-menu runs this in a terminal, because that's where sudo asks for the password.
+set -Euo pipefail
+
+# These only take effect after a restart.
+core=(linux linux-firmware systemd glibc hyprland amd-ucode intel-ucode nvidia-open-dkms)
+
+versions() { pacman -Q "${core[@]}" 2>/dev/null; }
+
+before=$(versions)
+rig_before=$(git -C "$HOME/rig" rev-parse HEAD)
+
+if ! RIG_UPDATING=1 "$HOME/rig/install.sh"; then
+  echo
+  echo "Opdateringen fejlede. Tryk Super + A, så kan Claude hjælpe."
+  read -rp "Tryk Enter for at lukke. "
+  exit 1
+fi
+
+# Waybar only reads its config when it starts, unless it's told to.
+pkill -USR2 -x waybar || true
+
+restart=no
+[[ -d /usr/lib/modules/$(uname -r) ]] || restart=yes
+[[ $(versions) == "$before" ]] || restart=yes
+git -C "$HOME/rig" diff --quiet "$rig_before" HEAD -- plymouth install || restart=yes
+
+echo
+if [[ $restart == no ]]; then
+  read -rp "Alt er opdateret, og der er ikke brug for en genstart. Tryk Enter for at lukke. "
+  exit 0
+fi
+
+read -rp "Alt er opdateret, men det kræver en genstart. Genstart nu? [j/N] " answer
+if [[ ${answer,,} == j* ]]; then
+  systemctl reboot
+fi

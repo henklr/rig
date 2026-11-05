@@ -289,7 +289,7 @@ finish() {
   info "Claude Code: $(claude --version)"
   info "Hyprland:    $(pacman -Q hyprland | cut -d' ' -f2)"
   info "Log:         $LOG"
-  [[ -n ${RIG_HANDOFF:-} ]] && return 0
+  [[ -n ${RIG_HANDOFF:-}${RIG_UPDATING:-} ]] && return 0
   info "Reboot, log in if asked, and Hyprland starts with Claude on screen."
 }
 

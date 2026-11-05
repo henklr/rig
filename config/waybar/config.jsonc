@@ -6,7 +6,7 @@
 
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "network", "bluetooth", "battery", "tray"],
+  "modules-right": ["pulseaudio", "network", "bluetooth", "battery", "tray", "custom/rig"],
 
   "hyprland/workspaces": {
     "format": "{id}"
@@ -39,5 +39,10 @@
   },
   "tray": {
     "spacing": 8
+  },
+  "custom/rig": {
+    "format": "\uf013",
+    "tooltip": false,
+    "on-click": "rig-menu"
   }
 }

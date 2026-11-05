@@ -33,6 +33,14 @@ window#waybar {
   padding: 0 6px;
 }
 
+#custom-rig {
+  padding: 0 10px;
+}
+
+#custom-rig:hover {
+  color: #d97757;
+}
+
 #battery.low {
   color: #cc4646;
 }

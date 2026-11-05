@@ -55,6 +55,7 @@ Programmer, vinduer og taster kommer fra mine gamle dotfiles. Resten skal bygges
 | `Super + V` | Flydende vindue |
 | `Super + P` / `J` | Pseudotile / skift split |
 | `Super + L` | Lås skærmen |
+| `Super + M` | rig-menuen, også knappen øverst til højre |
 | `Super + piletast` | Flyt fokus |
 | `Super + Shift + piletast` | Byt vinduer |
 | `Super + S` / `Super + Shift + S` | Vis scratchpad / flyt vindue dertil |
@@ -76,7 +77,9 @@ Reglerne, Claude arbejder efter, står i [CLAUDE.md](CLAUDE.md) og [claude/CLAUD
 
 ## Vedligehold
 
-Installeren kan køres igen. Det er også sådan, du reparerer eller opdaterer:
+Klik på tandhjulet øverst til højre, eller tryk `Super + M`, og vælg **Opdater**. Det henter det nyeste fra GitHub, opdaterer systemet og spørger om genstart, hvis det er nødvendigt. Menuen kan også genstarte og slukke maskinen.
+
+Installeren kan også køres direkte, for eksempel fra en konsol, hvis skrivebordet ikke starter:
 
 ```bash
 ~/rig/install.sh

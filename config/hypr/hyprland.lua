@@ -156,6 +156,7 @@ hl.bind(mod .. " + Space", hl.dsp.exec_cmd(launcher))
 hl.bind(mod .. " + B", hl.dsp.exec_cmd(browser))
 hl.bind(mod .. " + F", hl.dsp.exec_cmd(files))
 hl.bind(mod .. " + L", hl.dsp.exec_cmd("hyprlock"))
+hl.bind(mod .. " + M", hl.dsp.exec_cmd("rig-menu"))
 
 hl.bind(mod .. " + Q", hl.dsp.window.close())
 hl.bind(mod .. " + SHIFT + F", hl.dsp.window.fullscreen())
@@ -211,6 +212,14 @@ hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = tr
 ---------------
 ---- RULES ----
 ---------------
+
+hl.window_rule({
+    name   = "rig-update",
+    match  = { class = "^rig\\.update$" },
+    float  = true,
+    center = true,
+    size   = { 900, 560 },
+})
 
 hl.window_rule({
     name  = "suppress-maximize-events",

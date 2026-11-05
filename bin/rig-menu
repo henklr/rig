@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# The rig menu, behind the button in Waybar and Super + M.
+# A new entry is one line below: what it says, then what it runs.
+set -Eeuo pipefail
+
+entries='Opdater|alacritty --class rig.update -e rig-update
+Genstart|systemctl reboot
+Sluk|systemctl poweroff'
+
+choice=$(cut -d'|' -f1 <<<"$entries" | fuzzel --dmenu --minimal-lines --prompt='rig  ') || exit 0
+command=$(grep "^$choice|" <<<"$entries" | cut -d'|' -f2-)
+exec bash -c "$command"

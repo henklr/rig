@@ -267,6 +267,25 @@ EOF
   desktop_state | tee after-show.txt
   grep -q 'special: special:copilot' after-show.txt || fail "Super + A did not bring Claude back."
   screenshot 7-claude-back
+
+  say "Pressing Super + M for the rig menu"
+  monitor "sendkey meta_l-m"
+  sleep 3
+  screenshot 8-menu
+  remote "$USERNAME@localhost" 'pgrep -x fuzzel >/dev/null' || fail "Super + M opened no menu."
+  monitor "sendkey esc"
+  sleep 2
+
+  say "Clicking the rig button, which sits in the top right corner"
+  monitor "mouse_move 3000 -3000"
+  sleep 1
+  monitor "mouse_button 1"
+  sleep 1
+  monitor "mouse_button 0"
+  sleep 3
+  screenshot 9-menu-clicked
+  remote "$USERNAME@localhost" 'pgrep -x fuzzel >/dev/null' || fail "the button in Waybar opened no menu."
+  monitor "sendkey esc"
 }
 
 # Prints what's on screen in a form the checks above can grep. An SSH session
@@ -299,19 +318,21 @@ echo "exit: $?"
 tail -6 /tmp/rerun.log
 grep -c 'could not update' /tmp/rerun.log | sed 's/^/update warnings: /'
 
-# What the README says to run: it must fetch what's new on its own.
+# What the menu's Opdater runs: it must fetch what's new on its own.
 git -C "$HOME/rig" reset -q --hard HEAD~1
-"$HOME/rig/install.sh" >/tmp/rerun-local.log 2>&1
-echo "local exit: $?"
+rig-update </dev/null >/tmp/update.log 2>&1
+echo "update exit: $?"
 echo "behind: $(git -C "$HOME/rig" rev-list --count 'HEAD..@{upstream}')"
+grep -c 'Alt er opdateret' /tmp/update.log | sed 's/^/update finished: /'
 sudo rm -f "$rule"
 echo "repo changes: [$(git -C "$HOME/rig" status --porcelain)]"
 if [[ -e ~/.local/state/rig/first-boot ]]; then echo "flag: there"; else echo "flag: gone"; fi
 EOF
   grep -q '^exit: 0$' rerun.txt || fail "the installer failed on an installed system."
   grep -q '^update warnings: 0$' rerun.txt || fail "a second run could not update ~/rig."
-  grep -q '^local exit: 0$' rerun.txt || fail "the installer in ~/rig failed on an installed system."
-  grep -q '^behind: 0$' rerun.txt || fail "the installer in ~/rig did not fetch the newest commits."
+  grep -q '^update exit: 0$' rerun.txt || fail "rig-update failed on an installed system."
+  grep -q '^behind: 0$' rerun.txt || fail "rig-update did not fetch the newest commits."
+  grep -q '^update finished: 1$' rerun.txt || fail "rig-update never got to its last question."
   grep -q '^repo changes: \[\]$' rerun.txt || fail "a second run changed the repo."
   grep -q '^flag: gone$' rerun.txt || fail "a second run brought back the first-login flag."
 }
