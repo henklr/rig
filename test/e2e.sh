@@ -328,8 +328,10 @@ tail -6 /tmp/rerun.log
 grep -c 'could not update' /tmp/rerun.log | sed 's/^/update warnings: /'
 
 # What the menu's Opdater runs: it must fetch what's new on its own.
+# It runs from a copy, because going a commit back would also test the old script.
+cp "$HOME/rig/bin/rig-update" /tmp/rig-update
 git -C "$HOME/rig" reset -q --hard HEAD~1
-rig-update </dev/null >/tmp/update.log 2>&1
+/tmp/rig-update </dev/null >/tmp/update.log 2>&1
 echo "update exit: $?"
 echo "behind: $(git -C "$HOME/rig" rev-list --count 'HEAD..@{upstream}')"
 grep -c 'Alt er opdateret' /tmp/update.log | sed 's/^/update finished: /'
