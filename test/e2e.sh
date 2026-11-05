@@ -433,6 +433,10 @@ grep -c 'could not update' /tmp/rerun.log | sed 's/^/update warnings: /'
 # It runs from a copy, because going a commit back would also test the old script.
 cp "$HOME/rig/bin/rig-update" /tmp/rig-update
 git -C "$HOME/rig" reset -q --hard HEAD~1
+# Hyprland reloads when its config changes, which a pull can catch halfway.
+mv ~/rig/config/hypr/hyprland.lua /tmp/hyprland.lua
+sleep 2
+mv /tmp/hyprland.lua ~/rig/config/hypr/hyprland.lua
 /tmp/rig-update </dev/null >/tmp/update.log 2>&1
 echo "update exit: $?"
 echo "behind: $(git -C "$HOME/rig" rev-list --count 'HEAD..@{upstream}')"
@@ -448,6 +452,8 @@ EOF
   grep -q '^update finished: 1$' rerun.txt || fail "rig-update never got to its last question."
   grep -q '^repo changes: \[\]$' rerun.txt || fail "a second run changed the repo."
   grep -q '^flag: gone$' rerun.txt || fail "a second run brought back the first-login flag."
+  desktop_state | tee after-rerun.txt
+  grep -q '^errors: no errors$' after-rerun.txt || fail "the update left a config error on the screen."
 }
 
 prepare

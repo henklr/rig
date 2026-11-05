@@ -287,6 +287,16 @@ enable_services() {
   sudo systemctl enable NetworkManager.service
 }
 
+# Git replaces files as it pulls. If Hyprland looks at hyprland.lua just then, the
+# missing file stays on the screen as a config error until the next reload.
+reload_desktop() {
+  local instance
+  instance=$(hyprctl instances -j 2>/dev/null | jq -r '.[0].instance // empty') || return 0
+  if [[ -n $instance ]]; then
+    HYPRLAND_INSTANCE_SIGNATURE=$instance hyprctl reload >/dev/null || true
+  fi
+}
+
 finish() {
   step "Done"
   info "Claude Code: $(claude --version)"
@@ -316,6 +326,7 @@ main() {
   configure_snapshots
   configure_boot
   enable_services
+  reload_desktop
   finish
 }
 
