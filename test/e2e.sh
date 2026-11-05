@@ -453,7 +453,7 @@ EOF
   grep -q '^repo changes: \[\]$' rerun.txt || fail "a second run changed the repo."
   grep -q '^flag: gone$' rerun.txt || fail "a second run brought back the first-login flag."
   desktop_state | tee after-rerun.txt
-  grep -q '^errors: no errors$' after-rerun.txt || fail "the update left a config error on the screen."
+  grep -q '^errors: *$' after-rerun.txt || fail "the update left a config error on the screen."
 }
 
 prepare
