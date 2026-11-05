@@ -28,11 +28,13 @@ git -C "$HOME/rig" diff --quiet "$rig_before" HEAD -- plymouth install || restar
 
 echo
 if [[ $restart == no ]]; then
-  read -rp "Alt er opdateret, og der er ikke brug for en genstart. Tryk Enter for at lukke. "
+  echo "Alt er opdateret, og der er ikke brug for en genstart."
+  read -rp "Tryk Enter for at lukke. "
   exit 0
 fi
 
-read -rp "Alt er opdateret, men det kræver en genstart. Genstart nu? [j/N] " answer
+echo "Alt er opdateret, men det kræver en genstart."
+read -rp "Genstart nu? [j/N] " answer
 if [[ ${answer,,} == j* ]]; then
   systemctl reboot
 fi
