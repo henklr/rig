@@ -317,11 +317,15 @@ check_centered() {
 # bigger screen in here, because that is what moves everything on the small one.
 check_late_screen() {
   say "Connecting a larger screen at the password prompt"
-  # A reset skips the flush, and the rerun has just rewritten the initramfs.
-  remote "$USERNAME@localhost" sync
+  # secondary-vga is the only screen QEMU can plug into a running VM, and the
+  # initramfs has no driver for it. A reset doesn't flush, hence the sync.
+  remote "$USERNAME@localhost" "PASSWORD=$PASSWORD bash -ls" <<'EOF'
+printf '%s\n' "$PASSWORD" | sudo -S sh -c \
+  'echo "MODULES=(bochs)" >/etc/mkinitcpio.conf.d/e2e.conf && mkinitcpio -P && sync'
+EOF
   monitor system_reset
   sleep 45
-  monitor "device_add virtio-gpu-pci,id=late,xres=1920,yres=1080"
+  monitor "device_add secondary-vga,id=late,xres=1920,yres=1080"
   sleep 20
   screenshot 3-boot-screen-small
   monitor "screendump $WORK/3-boot-screen-large.png -f png late"
