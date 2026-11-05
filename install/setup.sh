@@ -266,6 +266,9 @@ install_boot_screen() {
   sudo plymouth-set-default-theme rig
   sudo sed -i '/^HOOKS=/{/plymouth/!s/ systemd / systemd plymouth /}' "$hooks"
   sudo sed -i '/^options/{/ splash/!s/$/ splash/}' "$entry"
+  # KEYMAP_TOGGLE is simply a second keymap, loaded on top of the layout.
+  grep -q '^KEYMAP_TOGGLE=' /etc/vconsole.conf ||
+    echo "KEYMAP_TOGGLE=$theme/ctrl-backspace.map" | sudo tee -a /etc/vconsole.conf >/dev/null
   sudo mkinitcpio -P
 }
 

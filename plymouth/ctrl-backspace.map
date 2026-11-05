@@ -1,0 +1,3 @@
+# Ctrl + Backspace sends Ctrl + U, which clears the password in Plymouth and the
+# line in the console. install/setup.sh loads this on top of the layout.
+control keycode 14 = Control_u
