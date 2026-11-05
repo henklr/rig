@@ -66,6 +66,49 @@ hl.window_rule({
 hl.workspace_rule({ workspace = "special:copilot", gaps_out = 48 })
 
 
+------------------
+---- FLOATING ----
+------------------
+
+-- Super + T turns a workspace into an ordinary desktop: its windows float, and
+-- so do new ones, until the same key tiles them again. New windows need a rule
+-- to open at their own size, because a window floated later keeps its tiled size.
+local floating_rules = {}
+
+for i = 1, 10 do
+    floating_rules[i] = hl.window_rule({
+        name    = "floating-workspace-" .. i,
+        match   = { workspace = tostring(i) },
+        float   = true,
+        enabled = false,
+    })
+end
+
+-- Global, so bin/rig-menu can reach it with hyprctl eval.
+function toggle_floating()
+    local workspace = hl.get_active_workspace()
+    local rule = workspace and floating_rules[workspace.id]
+    if not rule then
+        return
+    end
+
+    local floating = not rule:is_enabled()
+    local action = floating and "enable" or "disable"
+    rule:set_enabled(floating)
+    for _, window in ipairs(workspace:get_windows()) do
+        hl.dispatch(hl.dsp.window.float({ action = action, window = window }))
+    end
+    hl.notification.create({ text = floating and "Flydende vinduer" or "Tiling", timeout = 1500 })
+end
+
+hl.on("window.move_to_workspace", function(window, workspace)
+    local rule = floating_rules[workspace.id]
+    if rule and rule:is_enabled() then
+        hl.dispatch(hl.dsp.window.float({ action = "enable", window = window }))
+    end
+end)
+
+
 -------------------
 ---- AUTOSTART ----
 -------------------
@@ -98,6 +141,7 @@ hl.config({
         gaps_in     = 3,
         gaps_out    = 6,
         border_size = 1,
+        resize_on_border = true,
         col = {
             active_border   = { colors = { "rgba(33ccffee)", "rgba(00ff99ee)" }, angle = 45 },
             inactive_border = "rgba(595959aa)",
@@ -161,6 +205,7 @@ hl.bind(mod .. " + M", hl.dsp.exec_cmd("rig-menu"))
 hl.bind(mod .. " + Q", hl.dsp.window.close())
 hl.bind(mod .. " + SHIFT + F", hl.dsp.window.fullscreen())
 hl.bind(mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mod .. " + T", toggle_floating)
 hl.bind(mod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mod .. " + SHIFT + E", hl.dsp.exit())

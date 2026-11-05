@@ -4,6 +4,7 @@
 set -Eeuo pipefail
 
 entries='Opdater|alacritty --class rig.update -e rig-update
+Flydende vinduer til/fra|hyprctl eval "toggle_floating()"
 Genstart|systemctl reboot
 Sluk|systemctl poweroff'
 

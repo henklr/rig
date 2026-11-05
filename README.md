@@ -53,6 +53,7 @@ Programmer, vinduer og taster kommer fra mine gamle dotfiles. Resten skal bygges
 | `Super + Q` | Luk vindue |
 | `Super + Shift + F` | Fuld skærm |
 | `Super + V` | Flydende vindue |
+| `Super + T` | Flydende vinduer på hele workspacet, eller tilbage til tiling |
 | `Super + P` / `J` | Pseudotile / skift split |
 | `Super + L` | Lås skærmen |
 | `Super + M` | rig-menuen, også knappen øverst til højre |
@@ -77,7 +78,7 @@ Reglerne, Claude arbejder efter, står i [CLAUDE.md](CLAUDE.md) og [claude/CLAUD
 
 ## Vedligehold
 
-Klik på tandhjulet øverst til højre, eller tryk `Super + M`, og vælg **Opdater**. Det henter det nyeste fra GitHub, opdaterer systemet og spørger om genstart, hvis det er nødvendigt. Menuen kan også genstarte og slukke maskinen.
+Klik på tandhjulet øverst til højre, eller tryk `Super + M`, og vælg **Opdater**. Det henter det nyeste fra GitHub, opdaterer systemet og spørger om genstart, hvis det er nødvendigt. Menuen kan også skifte det aktuelle workspace mellem tiling og flydende vinduer og genstarte eller slukke maskinen.
 
 Installeren kan også køres direkte, for eksempel fra en konsol, hvis skrivebordet ikke starter:
 
