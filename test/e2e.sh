@@ -310,8 +310,8 @@ if [[ -e ~/.local/state/rig/first-boot ]]; then echo "flag: there"; else echo "f
 EOF
   grep -q '^exit: 0$' rerun.txt || fail "the installer failed on an installed system."
   grep -q '^update warnings: 0$' rerun.txt || fail "a second run could not update ~/rig."
-  grep -q '^local exit: 0$' rerun.txt || fail "~/rig/install.sh failed on an installed system."
-  grep -q '^behind: 0$' rerun.txt || fail "~/rig/install.sh did not fetch the newest commits."
+  grep -q '^local exit: 0$' rerun.txt || fail "the installer in ~/rig failed on an installed system."
+  grep -q '^behind: 0$' rerun.txt || fail "the installer in ~/rig did not fetch the newest commits."
   grep -q '^repo changes: \[\]$' rerun.txt || fail "a second run changed the repo."
   grep -q '^flag: gone$' rerun.txt || fail "a second run brought back the first-login flag."
 }
