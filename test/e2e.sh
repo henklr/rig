@@ -49,7 +49,6 @@ screenshot() {
   sleep 2
 }
 
-# Types on the VM's keyboard, as a person at the machine would.
 start_vm() {
   local name=$1
   shift
