@@ -57,7 +57,7 @@ install_bootloader() {
   }
   cat >/boot/loader/loader.conf <<'EOF'
 default arch.conf
-timeout 3
+timeout 0
 editor no
 EOF
   cat >/boot/loader/entries/arch.conf <<EOF

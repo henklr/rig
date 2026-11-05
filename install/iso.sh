@@ -87,7 +87,7 @@ gather_settings() {
   loadkeys "$RIG_KEYMAP" 2>/dev/null || true
   ask RIG_HOSTNAME "Computer name" rig '^[a-z0-9][a-z0-9-]*$'
   ask RIG_USER "Your username" "" '^[a-z_][a-z0-9_-]*$'
-  ask_secret RIG_PASSWORD "Password (login, sudo and disk encryption)"
+  ask_secret RIG_PASSWORD "Password (disk encryption, sudo and lock screen)"
   ask RIG_ENCRYPT "Encrypt the disk? (yes/no)" yes '^(yes|no)$'
   ask RIG_TIMEZONE "Time zone" Europe/Copenhagen '^[A-Za-z0-9_+/-]+$'
   [[ -e /usr/share/zoneinfo/$RIG_TIMEZONE ]] || die "unknown time zone $RIG_TIMEZONE."
@@ -239,7 +239,7 @@ finish() {
 
   step "Done"
   if [[ $DESKTOP_OK == yes ]]; then
-    info "Log in after the reboot and Hyprland starts with Claude on screen."
+    info "Type the password after the reboot and Hyprland starts with Claude on screen."
   else
     warn "the desktop setup failed, but the system boots."
     info "Log in after the reboot and run ~/rig/install.sh, or just: claude"

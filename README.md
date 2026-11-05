@@ -22,7 +22,9 @@ Kør så:
 curl -fsSL https://github.com/henklr/rig/raw/main/install.sh | bash
 ```
 
-Du bliver spurgt om brugernavn, adgangskode og hvilken disk, Arch skal på, og den disk bliver **slettet helt**. Den samme adgangskode bruges til login, sudo og diskkryptering. Du skal skrive diskens navn for at bekræfte. Bagefter kører resten af sig selv. Log ind efter genstart, så starter Hyprland med Claude på skærmen, klar til at logge ind på din konto.
+Du bliver spurgt om brugernavn, adgangskode og hvilken disk, Arch skal på, og den disk bliver **slettet helt**. Den samme adgangskode bruges til diskkryptering, sudo og låseskærm. Du skal skrive diskens navn for at bekræfte. Bagefter kører resten af sig selv. Efter genstart skriver du adgangskoden til disken, og så starter Hyprland med Claude på skærmen, klar til at logge ind på din konto.
+
+Der er ingen bootmenu og intet login efter diskens adgangskode. Hold en tast nede under opstart for at se bootmenuen. Installerer du uden kryptering, logger du ind som normalt.
 
 Har du allerede installeret Arch, virker den samme kommando. Den rører ikke din disk og lægger kun skrivebordet ovenpå.
 
@@ -60,7 +62,7 @@ Programmer, vinduer og taster kommer fra mine gamle dotfiles. Resten skal bygges
 | `Super + Shift + 1-0` | Flyt vindue til workspace |
 | `Super + Shift + V` | Udklipsholder-historik |
 | `Print` | Skærmbillede af et område til udklipsholderen |
-| `Super + Shift + E` | Log ud |
+| `Super + Shift + E` | Genstart skrivebordet |
 
 ## Claude som copilot
 

@@ -50,15 +50,6 @@ screenshot() {
 }
 
 # Types on the VM's keyboard, as a person at the machine would.
-type_keys() {
-  local i
-  for ((i = 0; i < ${#1}; i++)); do
-    monitor "sendkey ${1:i:1}"
-    sleep 0.2
-  done
-  monitor "sendkey ret"
-}
-
 start_vm() {
   local name=$1
   shift
@@ -217,19 +208,19 @@ chmod +x /tmp/fake-askpass
 sudo -k
 SUDO_ASKPASS=/tmp/fake-askpass sudo -A true
 check "askpass can see the sudo command" grep -q '^sudo -A true$' /tmp/askpass-parent
+
+check "boot menu is hidden" sh -c 'printf "%s\n" "$PASSWORD" | sudo -S grep -q "^timeout 0" /boot/loader/loader.conf'
 EOF
   grep -q '^FAIL' checks.txt && fail "some checks failed, see above."
   return 0
 }
 
 check_desktop() {
-  say "Logging in at the keyboard"
-  screenshot 3-login
-  type_keys "$USERNAME"
-  sleep 3
-  type_keys "$PASSWORD"
-  sleep 60
-  screenshot 4-after-login
+  say "Waiting for the desktop, without touching the keyboard"
+  sleep 30
+  screenshot 3-desktop
+  remote "$USERNAME@localhost" 'loginctl list-sessions --no-legend | grep -q tty1' ||
+    fail "tty1 did not log in by itself after the disk passphrase."
 
   if remote "$USERNAME@localhost" 'pgrep -x Hyprland >/dev/null'; then
     say "Hyprland started on the console"

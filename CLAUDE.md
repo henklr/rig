@@ -33,7 +33,7 @@ Vigtigt: Hyprland har skiftet config-sprog, og det meste, der står på nettet, 
 - `hyprctl dispatch` tager Lua: `hyprctl dispatch 'hl.dsp.exit()'`. Den gamle `hyprctl dispatch exit` virker ikke.
 - `hyprlock` og `hypridle` bruger stadig det gamle `.conf`-format.
 - Kør `Hyprland --verify-config` efter hver ændring i configen.
-- Sessionen startes med `start-hyprland` fra `shell/bash_profile`, uden display manager eller uwsm.
+- Sessionen startes med `start-hyprland` fra `shell/bash_profile`, uden display manager eller uwsm. På en krypteret disk logger tty1 selv ind, så diskens adgangskode er den eneste ved opstart. Uden kryptering skal man logge ind.
 
 ## Kendte huller
 

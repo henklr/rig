@@ -230,6 +230,24 @@ configure_snapshots() {
   sudo snapper --no-dbus -c root create -d "rig: fresh install"
 }
 
+# The disk password is the only one at boot: no menu before it and no login after
+# it. Without encryption that would mean no password at all, so tty1 only logs in
+# by itself when the root disk is encrypted.
+configure_boot() {
+  step "Setting up the boot"
+  if sudo test -f /boot/loader/loader.conf; then
+    sudo sed -i 's/^timeout .*/timeout 0/' /boot/loader/loader.conf
+  fi
+
+  [[ $(lsblk -dno TYPE "$(findmnt -no SOURCE --nofsroot /)") == crypt ]] || return 0
+  sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
+  sudo tee /etc/systemd/system/getty@tty1.service.d/autologin.conf >/dev/null <<EOF
+[Service]
+ExecStart=
+ExecStart=-/usr/bin/agetty --noreset --noclear --autologin $USER - \${TERM}
+EOF
+}
+
 enable_services() {
   step "Enabling services"
   sudo systemctl enable bluetooth.service fstrim.timer systemd-timesyncd.service
@@ -251,7 +269,7 @@ finish() {
   info "Hyprland:    $(pacman -Q hyprland | cut -d' ' -f2)"
   info "Log:         $LOG"
   [[ -n ${RIG_HANDOFF:-} ]] && return 0
-  info "Reboot, log in, and Hyprland starts with Claude on screen."
+  info "Reboot, log in if asked, and Hyprland starts with Claude on screen."
 }
 
 main() {
@@ -272,6 +290,7 @@ main() {
   write_machine_config
   configure_claude
   configure_snapshots
+  configure_boot
   enable_services
   finish
 }
