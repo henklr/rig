@@ -2,6 +2,22 @@
 
 Et personligt Arch + Hyprland-system. Repoet er kilden til hele systemet: Hvis en ændring ikke står her, overlever den ikke en geninstallation.
 
+## Retning
+
+rig skal være en tiling window manager, der føles lige så lækker som macOS, men med lidt mere effektivitet og fleksibilitet. Brugeren selv er den eneste bruger, og spil skal virke godt.
+
+- **Lækkert:** Blød bevægelse, ens og pænt udseende på tværs af programmer, og at det bare virker.
+- **Effektivt:** Vinduer placerer sig selv, tastaturet kan klare alt, søgningen er hurtig, og alt kan ændres med Claude og git.
+
+Sig det højt, når en idé ikke flytter systemet mod det mål. Giv valgmuligheder frem for at beslutte på brugerens vegne. Rækkefølgen står i [PLAN.md](PLAN.md), og den skal opdateres, når et punkt er færdigt.
+
+## Sådan arbejder vi
+
+- **Ret og prøv med det samme.** Hyprland genindlæser configen, når den gemmes, så brugeren kan mærke en ændring med det samme.
+- **Commit, når brugeren er tilfreds,** og push til `main`. Lint kører ved hvert push.
+- **Ændringer i `install/` laves på en branch,** og e2e skal bestå, før de merges.
+- **Svar kort.** Lange opsummeringer bliver ikke læst.
+
 ## Sådan er det skruet sammen
 
 | Sti | Hvad |
